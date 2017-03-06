@@ -5,7 +5,7 @@ var creatures = [];
 var food = [];
 var popul = new Population();
 var creatures_count = 50;
-var food_count = 20;
+var food_count = 50;
 var fit = 20;
 var f;
 var mult = 3;

@@ -1,7 +1,7 @@
 function Creature(genes){
 	this.pos = createVector(random(width), random(height));
 	this.vel = p5.Vector.random2D();
-	this.brain = new NeuralNetwork([2, 8, 2]);
+	this.brain = new NeuralNetwork([2, 2, 2]);
 	this.genome = {'genes':[]};
 	if(genes){
 		this.brain.setWeights(genes);
@@ -24,19 +24,10 @@ Creature.prototype.closestFood = function(){
 		}
 		if(dist < 10){
 			food[i].pos = createVector(random(width), random(height));
-			if(food[i].poison){
-				this.die();
-			}else{
-				this.fitness++;
-			}
+			this.fitness++;
 		}
 	}
 	return food[index];
-}
-
-Creature.prototype.die = function(){
-	this.fitness = 0;
-	this.alive = false;
 }
 
 Creature.prototype.update = function(){
@@ -46,7 +37,7 @@ Creature.prototype.update = function(){
 	pair = this.brain.process([this.pos.x - closest.pos.x, this.pos.y - closest.pos.y]);
 	this.vel = createVector(pair[0] * 2 - 1, pair[1] * 2 - 1).mult(mult);
 	this.pos.add(this.vel);
-	
+
 	if(this.pos.x > width + 10) this.pos.x = 0;
 	if(this.pos.x < -10) this.pos.x = width;
 	if(this.pos.y > height + 10) this.pos.y = 0;
