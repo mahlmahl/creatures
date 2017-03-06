@@ -107,14 +107,18 @@ NeuralNetwork.prototype.setWeights = function(weights){
 
 // show functions 
 
+Neuron.prototype.roundme = function(x){
+	return round(x * 100) / 100;
+}
+
 Neuron.prototype.show = function(){
 	var out = '<table border="1">';
 	for(var i = 0, wl = this.weights.length; i < wl; i++){
-		out += '<tr><td>w<sub>' + i + '</sub></td><td>' + this.weights[i] + '</td></tr>';
+		out += '<tr><td width="60">w<sub>' + i + '</sub></td><td width="60">' + this.roundme(this.weights[i]) + '</td></tr>';
 	}
-	out += '<tr><td>b</td><td>' + this.bias + '</td></tr>';
-	out += '<tr><td>r</td><td>' + this.result + '</td></tr>';
-	out += '<tr><td class="out">o</td><td class="out">' + this.output + '</td></tr>';
+	out += '<tr><td>b</td><td>' + this.roundme(this.bias) + '</td></tr>';
+	out += '<tr><td>r</td><td>' + this.roundme(this.result) + '</td></tr>';
+	out += '<tr><td class="out">o</td><td class="out">' + this.roundme(this.output) + '</td></tr>';
 	out += '</table>';
 	return out;
 }
@@ -131,7 +135,7 @@ Layer.prototype.show = function(){
 NeuralNetwork.prototype.show = function(){
 	var out = '<table><tr>';
 	for(var i = 0, il = this.inputs.length; i < il; i++){
-		out += '<td class="out">' + this.inputs[i] + '</td>';
+		out += '<td class="out">' + Math.round(this.inputs[i]) + '</td>';
 	}
 	out += '</tr></table><hr/>';
 	for(var l = 0, ll = this.layers.length; l < ll; l++){

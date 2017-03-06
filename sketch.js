@@ -1,35 +1,41 @@
+var generation = 1;
+var best;
 var creatures = [];
 var food = [];
 var popul = new Population();
-var all = 200;
-var fs = 200;
+var creatures_count = 50;
+var food_count = 20;
+var fit = 20;
 var f;
+var mult = 3;
 
 function setup() {
-	createCanvas(600, 600);
-	for(var i = 0; i < fs; i++){
+	createCanvas(800, 600);
+	for(var i = 0; i < food_count; i++){
 		food.push(new Food());
 	}
-	for(var i = 0; i < all; i++){
+	for(var i = 0; i < creatures_count; i++){
 		creatures.push(new Creature());
 	}
 	popul.setIndividuals(creatures);
 }
 
 function draw() {
-	background(150);
-	for(var i = 0; i < fs; i++){
+	background(91);
+	for(var i = 0; i < food_count; i++){
 		food[i].show();
 	}
-	for(var i = 0; i < all; i++){
+	for(var i = 0; i < creatures_count; i++){
 		creatures[i].update();
 		creatures[i].show();
 	}
 	
-	if(popul.maxFitness() > 100){
+	if(popul.maxFitness() >= fit){
 		selection();
 	}
 	
+	document.getElementById("status").innerHTML = "generation: "+generation+", best fitness: " + popul.bestFitness + "/" + fit;
+	document.getElementById("neural").innerHTML = best.brain.show();
 }
 
 function selection(){
@@ -46,4 +52,5 @@ function selection(){
 	popul.mutation();
 	popul.bestFitness = 0;
 	creatures = popul.individuals;
+	generation++;
 }

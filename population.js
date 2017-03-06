@@ -4,7 +4,7 @@ function Population(){
 	this.bestFitness = 0;
 	this.genesLength = 0;
 	this.mutationRate = 0.01;
-	this.crossoverMode = 'mid'; // '50';
+	this.crossoverMode = '50'; // 'mid';
 	
 }
 
@@ -42,7 +42,7 @@ Population.prototype.selectIndividual = function(){
 		iterations++;
 		var fitness = Math.floor(Math.random() * this.maxFitness());
 		var index = Math.floor(Math.random() * this.individuals.length);
-		if(this.checkIndividual(this.individuals[index]) && this.individuals[index].fitness > fitness) return this.individuals[index];
+		if(this.checkIndividual(this.individuals[index]) && this.individuals[index].fitness > fitness && this.individuals[index].alive) return this.individuals[index];
 		if(iterations > 1000) return null;
 	}
 }
