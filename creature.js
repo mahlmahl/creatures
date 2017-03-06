@@ -35,7 +35,7 @@ Creature.prototype.update = function(){
 	var pair;
 	var closest = this.closestFood();
 	pair = this.brain.process([this.pos.x - closest.pos.x, this.pos.y - closest.pos.y, this.vel.mag(), this.vel.heading()]);
-	this.vel = createVector(pair[0] * 2 - 1, pair[1] * 2 - 1).mult(mult);
+	this.vel = createVector(pair[0], pair[1]).mult(mult);
 	this.pos.add(this.vel);
 
 	if(this.pos.x > width + 10) this.pos.x = 0;

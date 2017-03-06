@@ -8,7 +8,7 @@ var creatures_count = 50;
 var food_count = 50;
 var fit = 20;
 var f;
-var mult = 3;
+var mult = 2;
 
 function setup() {
 	createCanvas(800, 700);

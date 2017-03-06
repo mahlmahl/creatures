@@ -21,6 +21,10 @@ Neuron.prototype.sigmoid = function(x){
 	return 1.0 / (1.0 + Math.exp(-x));
 }
 
+Neuron.prototype.tanh = function(x){
+	return Math.tanh(x);
+}
+
 Neuron.prototype.process = function(array_of_inputs){
 	if(array_of_inputs.length != this.weights.length) return false;
 	this.result = null;
@@ -28,7 +32,7 @@ Neuron.prototype.process = function(array_of_inputs){
 		this.result += array_of_inputs[i] * this.weights[i];
 	}
 	this.result += this.bias;
-	this.output = this.sigmoid(this.result);
+	this.output = this.tanh(this.result);
 }
 
 // Layer class
