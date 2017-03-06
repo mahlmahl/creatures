@@ -1,5 +1,6 @@
 var generation = 1;
 var best;
+var aver = [];
 var creatures = [];
 var food = [];
 var popul = new Population();
@@ -10,7 +11,7 @@ var f;
 var mult = 3;
 
 function setup() {
-	createCanvas(800, 600);
+	createCanvas(800, 700);
 	for(var i = 0; i < food_count; i++){
 		food.push(new Food());
 	}
@@ -29,27 +30,34 @@ function draw() {
 		creatures[i].update();
 		creatures[i].show();
 	}
+	for(var i = 0; i < aver.length; i++){
+		fill(255, 0, 0, 50);
+		noStroke();
+		rect(i * 5 + 1, height - aver[i] * 5, 5, aver[i] * 5);
+	}
 	
 	if(popul.maxFitness() >= fit){
 		selection();
 	}
-	
-	document.getElementById("status").innerHTML = "generation: "+generation+", best fitness: " + popul.bestFitness + "/" + fit;
+	//if(frameCount % 1000 == 0) popul.mutation();
+	document.getElementById("status").innerHTML = "generation: "+generation+", best fitness: " + popul.bestFitness + "/" + fit + ", average fitness: " + popul.averFitness;
 	document.getElementById("neural").innerHTML = best.brain.show();
+	document.getElementById("weights").value = "["+best.brain.getWeights()+"]";
 }
 
 function selection(){
 	
+	aver.push(popul.averFitness);
 	var c = [];
 	
 	var children = popul.selection();
+	popul.mutation();
 	
 	for(var i = 0; i < children.length; i++){
 		c.push(new Creature(children[i]));
 	}
 
 	popul.setIndividuals(c);
-	popul.mutation();
 	popul.bestFitness = 0;
 	creatures = popul.individuals;
 	generation++;

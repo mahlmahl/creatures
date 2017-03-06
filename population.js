@@ -2,6 +2,7 @@ function Population(){
 	
 	this.individuals = [];
 	this.bestFitness = 0;
+	this.averFitness = 0;
 	this.genesLength = 0;
 	this.mutationRate = 0.01;
 	this.crossoverMode = '50'; // 'mid';
@@ -29,10 +30,13 @@ Population.prototype.setIndividuals = function(array_of_individuals){
 
 Population.prototype.maxFitness = function(){
 	var max = 0;
+	var sum = 0;
 	for(var i = 0, il = this.individuals.length; i < il; i++){
 		if(this.checkIndividual(this.individuals[i]) && this.individuals[i].fitness > max) max = this.individuals[i].fitness;
+		sum += this.individuals[i].fitness;
 	}
 	this.bestFitness = max;
+	this.averFitness = sum / il;
 	return max;	
 }
 
