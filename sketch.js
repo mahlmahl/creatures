@@ -35,12 +35,12 @@ function draw() {
 		noStroke();
 		rect(i * 5 + 1, height - aver[i] * 5, 5, aver[i] * 5);
 	}
-	
-	if(popul.maxFitness() >= fit){
+	popul.maxFitness();
+	if(/*popul.maxFitness() >= fit*/frameCount % 1000 == 0){
 		selection();
 	}
 	//if(frameCount % 1000 == 0) popul.mutation();
-	document.getElementById("status").innerHTML = "generation: "+generation+", best fitness: " + popul.bestFitness + "/" + fit + ", average fitness: " + popul.averFitness;
+	document.getElementById("status").innerHTML = "generation: "+generation+", best fitness: " + popul.bestFitness + ", average fitness: " + popul.averFitness;
 	document.getElementById("neural").innerHTML = best.brain.show();
 	document.getElementById("weights").value = "["+best.brain.getWeights()+"]";
 }
