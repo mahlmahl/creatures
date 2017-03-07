@@ -17,30 +17,36 @@ Neuron.prototype.random = function(){
 	return Math.random() * 2 - 1;
 }
 
-Neuron.prototype.sigmoid = function(x){
-	return 1.0 / (1.0 + Math.exp(-x));
+Neuron.prototype.activate = function(x, activation_function){
+	switch (activation_function){
+		case 'tanh':
+			return Math.tanh(x);
+			break;
+		case 'sigmoid':
+			return 1.0 / (1.0 + Math.exp(-x));
+			break;
+		default:
+			return x;
+	}
 }
 
-Neuron.prototype.tanh = function(x){
-	return Math.tanh(x);
-}
-
-Neuron.prototype.process = function(array_of_inputs){
+Neuron.prototype.process = function(array_of_inputs, activation_function){
 	if(array_of_inputs.length != this.weights.length) return false;
 	this.result = null;
 	for(var i = 0, al = array_of_inputs.length; i < al; i++){
 		this.result += array_of_inputs[i] * this.weights[i];
 	}
 	this.result += this.bias;
-	this.output = this.tanh(this.result);
+	this.output = this.activate(this.result, activation_function);
 }
 
 // Layer class
 
-function Layer(number_of_neurons, inputs_per_neuron){
+function Layer(number_of_neurons, inputs_per_neuron, activation_function){
 	
 	this.neurons = [];
 	this.outputs = [];
+	this.activation_function = activation_function || 'none';
 	
 	for(var n = 0; n < number_of_neurons; n++){
 		this.neurons.push(new Neuron(inputs_per_neuron));
@@ -51,28 +57,29 @@ function Layer(number_of_neurons, inputs_per_neuron){
 Layer.prototype.process = function(array_of_inputs){
 	this.outputs = [];
 	for(var n = 0, nl = this.neurons.length; n < nl; n++){
-		this.neurons[n].process(array_of_inputs);
+		this.neurons[n].process(array_of_inputs, this.activation_function);
 		this.outputs.push(this.neurons[n].output);
 	}
 }
 
 // Neural Network class
 
-function NeuralNetwork(topology){
+function NeuralNetwork(topology, activation_functions_by_layers){
 	
 	this.layers = [];
 	this.inputs = [];
 	this.weights_count = 0;
+	this.activation_functions = activation_functions_by_layers || [];
 	
 	for(var t = 1, tl= topology.length; t < tl; t++){
-		this.layers.push(new Layer(topology[t], topology[t-1]));
+		this.layers.push(new Layer(topology[t], topology[t-1], this.activation_functions[t-1]));
 		this.weights_count += topology[t] * (topology[t-1] + 1);
 	}
 	
 }
 
 NeuralNetwork.prototype.process = function(array_of_inputs){
-	this.inputs = array_of_inputs;
+	this.inputs = array_of_inputs || [];
 	var inputs = this.inputs;
 	for(var l = 0, ll = this.layers.length; l < ll; l++){
 		this.layers[l].process(inputs);
@@ -107,43 +114,4 @@ NeuralNetwork.prototype.setWeights = function(weights){
 			index++;
 		}	
 	}
-}
-
-// show functions 
-
-Neuron.prototype.roundme = function(x){
-	return round(x * 100) / 100;
-}
-
-Neuron.prototype.show = function(){
-	var out = '<table border="1">';
-	for(var i = 0, wl = this.weights.length; i < wl; i++){
-		out += '<tr><td width="60">w<sub>' + i + '</sub></td><td width="60">' + this.roundme(this.weights[i]) + '</td></tr>';
-	}
-	out += '<tr><td>b</td><td>' + this.roundme(this.bias) + '</td></tr>';
-	out += '<tr><td>r</td><td>' + this.roundme(this.result) + '</td></tr>';
-	out += '<tr><td class="out">o</td><td class="out">' + this.roundme(this.output) + '</td></tr>';
-	out += '</table>';
-	return out;
-}
-
-Layer.prototype.show = function(){
-	var out = '<table border="0"><tr>';
-	for(var n = 0, nl = this.neurons.length; n < nl; n++){
-		out += '<td>' + this.neurons[n].show() + '</td>';
-	}
-	out += '</table>';
-	return out;
-}
-
-NeuralNetwork.prototype.show = function(){
-	var out = '<table><tr>';
-	for(var i = 0, il = this.inputs.length; i < il; i++){
-		out += '<td class="out">' + Math.round(this.inputs[i]) + '</td>';
-	}
-	out += '</tr></table><hr/>';
-	for(var l = 0, ll = this.layers.length; l < ll; l++){
-		out += this.layers[l].show() + '<hr/>';
-	}
-	return out;
 }

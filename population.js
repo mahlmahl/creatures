@@ -1,39 +1,41 @@
-function Population(){
+function Population(options){
+	
+	this.options = options || {};
+	this.mutationRate = this.options.mutationRate || 0.1;
+	this.crossoverMode = this.options.crossoverMode || '50'; // 'mid';
+	this.fitnessValue = this.options.fitnessValue || 'fitness';
+	this.genomeValue = this.options.genomeValue || 'genome';
 	
 	this.individuals = [];
 	this.bestFitness = 0;
 	this.averFitness = 0;
 	this.genesLength = 0;
-	this.mutationRate = 0.01;
-	this.crossoverMode = '50'; // 'mid';
 	
 }
 
 Population.prototype.checkIndividual = function(el){
-	if(el.fitness == undefined) throw "Error 01: At least one individual has no fitness!";
-	if(el.genome == undefined || el.genome.genes == undefined) throw "Error 01: At least one individual has no genome!";
-	if( ! this.genesLength) this.genesLength = el.genome.genes.length;
+	if(el[this.fitnessValue] == undefined) throw "Error 01: At least one individual has no fitness!";
+	if(el[this.genomeValue] == undefined) throw "Error 01: At least one individual has no genome!";
+	if( ! this.genesLength) this.genesLength = el[this.genomeValue].length;
 	return true;
 }
 
 Population.prototype.setIndividuals = function(array_of_individuals){
 	this.individuals = [];
-	var max = 0;
 	for(var i = 0, il = array_of_individuals.length; i < il; i++){
 		if(this.checkIndividual(array_of_individuals[i])){
 			this.individuals.push(array_of_individuals[i]);
-			if(this.individuals[i].fitness > max) max = this.individuals[i].fitness;
 		}
 	}
-	this.bestFitness = max;
+	this.maxFitness();
 }
 
 Population.prototype.maxFitness = function(){
 	var max = 0;
 	var sum = 0;
 	for(var i = 0, il = this.individuals.length; i < il; i++){
-		if(this.checkIndividual(this.individuals[i]) && this.individuals[i].fitness > max) max = this.individuals[i].fitness;
-		sum += this.individuals[i].fitness;
+		if(this.checkIndividual(this.individuals[i]) && this.individuals[i][this.fitnessValue] > max) max = this.individuals[i][this.fitnessValue];
+		sum += this.individuals[i][this.fitnessValue];
 	}
 	this.bestFitness = max;
 	this.averFitness = sum / il;
@@ -44,9 +46,9 @@ Population.prototype.selectIndividual = function(){
 	var iterations = 0;
 	while(true){
 		iterations++;
-		var fitness = Math.floor(Math.random() * this.maxFitness());
+		var random_fitness = Math.floor(Math.random() * this.maxFitness());
 		var index = Math.floor(Math.random() * this.individuals.length);
-		if(this.checkIndividual(this.individuals[index]) && this.individuals[index].fitness > fitness && this.individuals[index].alive) return this.individuals[index];
+		if(this.checkIndividual(this.individuals[index]) && this.individuals[index][this.fitnessValue] > random_fitness && this.individuals[index].alive) return this.individuals[index];
 		if(iterations > 1000) return null;
 	}
 }
@@ -67,10 +69,13 @@ Population.prototype.crossover = function(genome1, genome2){
 	var newgenome = [];
 	var mid = Math.floor(Math.random() * genome1.length);
 	for(var i = 0, il = genome1.length; i < il; i++){
-		if(this.crossoverMode == 'mid'){
-			newgenome.push(i < mid ? genome1[i] : genome2[i]);
-		}else{
-			newgenome.push(Math.random() < 0.5 ? genome1[i] : genome2[i]);
+		switch(this.crossoverMode){
+			case 'mid':
+				newgenome.push(i < mid ? genome1[i] : genome2[i]);
+				break;
+			case '50':
+				newgenome.push(Math.random() < 0.5 ? genome1[i] : genome2[i]);
+				break;
 		}
 	}
 	return newgenome;
@@ -81,17 +86,21 @@ Population.prototype.selection = function(){
 	var pair, child;
 	for(var i = 0, il = this.individuals.length; i < il; i++){
 		pair = this.selectPair();
-		child = this.crossover(pair[0].genome.genes, pair[1].genome.genes);
+		child = this.crossover(pair[0][this.genomeValue], pair[1][this.genomeValue]);
 		a.push(child);
 	}
 	return a;
 }
 
 Population.prototype.mutation = function(){
-	var glen;
+	var gran, geno;
 	for(var i = 0, il = this.individuals.length; i < il; i++){
 		if(Math.random() < this.mutationRate){
-			this.individuals[i].brain = new NeuralNetwork([2, 3, 2]);
+			geno = this.individuals[i].brain.getWeights();
+			gran = Math.floor(Math.random() * geno.length);
+			geno[gran] *= Math.random() - 1;
+			this.individuals[i].brain.setWeights(geno);
+			this.individuals[i][this.genomeValue] = geno;
 		}
 	}
 }
