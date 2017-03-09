@@ -2,7 +2,7 @@ function Population(options){
 	
 	this.options = options || {};
 	this.mutationRate = this.options.mutationRate || 0.1;
-	this.crossoverMode = this.options.crossoverMode || '50'; // 'mid';
+	this.crossoverMode = this.options.crossoverMode || '50:50'; // 'mid', 'ave', '50:50', 'low', 'hi';
 	this.fitnessValue = this.options.fitnessValue || 'fitness';
 	this.genomeValue = this.options.genomeValue || 'genome';
 	
@@ -67,16 +67,32 @@ Population.prototype.selectPair = function(){
 Population.prototype.crossover = function(genome1, genome2){
 	if(genome1.length != genome2.length) return false;
 	var newgenome = [];
+	var genome;
 	var mid = Math.floor(Math.random() * genome1.length);
 	for(var i = 0, il = genome1.length; i < il; i++){
 		switch(this.crossoverMode){
 			case 'mid':
-				newgenome.push(i < mid ? genome1[i] : genome2[i]);
+				genome = i < mid ? genome1[i] : genome2[i];
 				break;
-			case '50':
-				newgenome.push(Math.random() < 0.5 ? genome1[i] : genome2[i]);
+			case '50:50':
+				genome = Math.random() < 0.5 ? genome1[i] : genome2[i];
 				break;
+			case 'ave':
+				genome = (genome1[i] + genome2[i]) / 2;
+				break;
+			case 'low':
+				genome = Math.min(genome1[i],genome2[i]);
+				break;
+			case 'hi':
+				genome = Math.max(genome1[i],genome2[i]);
+				break;
+			default: // 50:50
+				genome = Math.random() < 0.5 ? genome1[i] : genome2[i];
 		}
+		if(Math.random() < this.mutationRate){
+			genome = Math.random() * 2 - 1;
+		}
+		newgenome.push(genome);
 	}
 	return newgenome;
 }
@@ -98,7 +114,7 @@ Population.prototype.mutation = function(){
 		if(Math.random() < this.mutationRate){
 			geno = this.individuals[i].brain.getWeights();
 			gran = Math.floor(Math.random() * geno.length);
-			geno[gran] *= Math.random() - 1;
+			geno[gran] *= Math.random() - 0.5;
 			this.individuals[i].brain.setWeights(geno);
 			this.individuals[i][this.genomeValue] = geno;
 		}

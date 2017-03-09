@@ -22,11 +22,29 @@ Neuron.prototype.activate = function(x, activation_function){
 		case 'tanh':
 			return Math.tanh(x);
 			break;
-		case 'sigmoid':
+		case 'sigm': // sigmoid
 			return 1.0 / (1.0 + Math.exp(-x));
 			break;
-		default:
+		case 'unit': //unit step
+			if(x < 0) return 0;
+			if(x == 0) return 0.5;
+			if(x > 0) return 1;
+			break;
+		case 'sign': // signum
+			if(x < 0) return -1;
+			if(x == 0) return 0.5;
+			if(x > 0) return 1;
+			break;
+		case 'wise': // piece-wise
+			if(x <= -0.5) return 0;
+			if(x > -0.5 && x < 0.5) return x + 0.5;
+			if(x >= 0.5) return 1;
+			break;
+		case 'line': // linear
 			return x;
+			break;
+		default: // Hyperbolic tangent
+			return Math.tanh(x);
 	}
 }
 
@@ -72,7 +90,7 @@ function NeuralNetwork(topology, activation_functions_by_layers){
 	this.activation_functions = activation_functions_by_layers || [];
 	
 	for(var t = 1, tl= topology.length; t < tl; t++){
-		this.layers.push(new Layer(topology[t], topology[t-1], this.activation_functions[t-1]));
+		this.layers.push(new Layer(topology[t], topology[t-1], this.activation_functions[t]));
 		this.weights_count += topology[t] * (topology[t-1] + 1);
 	}
 	
