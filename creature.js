@@ -1,7 +1,7 @@
 function Creature(genes){
 	this.pos = createVector(random(w), random(h));
 	this.vel = p5.Vector.random2D();
-	this.brain = new NeuralNetwork([4, 3, 2],[null, 'tanh', 'line']);
+	this.brain = NeuralNetwork.create([4, 3, 2],[null, 'tanh', 'line']);
 	if(genes){
 		this.brain.setWeights(genes);
 		this.genome = genes;

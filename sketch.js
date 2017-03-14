@@ -3,8 +3,8 @@ var best; //creature.js, line 46
 var aver = [];
 var food = [];
 var popul = new Population();
-var creatures_count = 50;
-var food_count = 50;
+var creatures_count = 80;
+var food_count = 80;
 var fit = 20;
 var f = [];
 var w = 800, h = 700;
